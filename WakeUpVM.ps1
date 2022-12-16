@@ -164,7 +164,9 @@ foreach( $VM in $VMs){
 }
 
 if( -not (Test-NetConnection $TergetHost).PingSucceeded ){
-	SendTeams "$TergetHost is down !!"
+	$Message = "$TergetHost is down !!"
+	Log $Message
+	SendTeams $Message
 }
 
 
