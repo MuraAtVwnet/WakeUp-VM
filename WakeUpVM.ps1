@@ -35,6 +35,9 @@ LAN-Syslog
 "@
 
 
+$TeamsURLFile = "C:\WindowsUpdate\MST_URI.txt"
+
+
 ##########################################################################
 # ログ出力
 ##########################################################################
@@ -87,6 +90,40 @@ function HereString2StringArray( $HereString ){
 	return $StringArray
 }
 
+####################################
+# Teams メッセージを送る
+####################################
+function SendTeams([string]$Message){
+
+	if(-not (Test-Path $TeamsURLFile)){
+		return
+	}
+
+	# Web API の URL
+	[array]$Lines = Get-Content -Path $TeamsURLFile
+	if( $Lines.Count -eq 0 ){
+		# データが入っていない
+		Log "URI file is empty : $TeamsURLFile"
+		return
+	}
+
+	$url = $Lines[0]
+	if( $url.Length -le 35 ){
+		# URIが短すぎ
+		Log "URI data is empty : $TeamsURLFile"
+		return
+	}
+
+	# Message
+	$body = ConvertTo-JSON @{
+		text = "$Message"
+	}
+
+	# API を叩く
+	Invoke-RestMethod -Method Post -Uri $url -Body $body -ContentType 'application/json'
+}
+
+
 
 ####################################
 # 停止している VM を起動する
@@ -101,6 +138,7 @@ function WakeUp([string]$VM_Name){
 	if( ($VM.State -eq [Microsoft.HyperV.PowerShell.VMState]::Off) -or ($VM.State -eq [Microsoft.HyperV.PowerShell.VMState]::Saved) ){
 		$VM_Name = $VM.Name
 		Log "$VM_Name が停止しているので起動"
+		SendTeams "Start VM : $VM_Name"
 		Start-VM -VM $VM
 	}
 }
