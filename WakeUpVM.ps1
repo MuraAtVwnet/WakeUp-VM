@@ -152,11 +152,19 @@ $HostName = $Env:COMPUTERNAME
 
 if( $HostName -eq "WSV11" ){
 	[array]$VMs = HereString2StringArray $Here_WSV11VMs
+	$TergetHost = "WSV12"
 }
 else{
 	[array]$VMs = HereString2StringArray $Here_WSV12VMs
+	$TergetHost = "WSV11"
 }
 
 foreach( $VM in $VMs){
 	WakeUp $VM
 }
+
+if( -not (Test-NetConnection $TergetHost).PingSucceeded ){
+	SendTeams "$TergetHost is down !!"
+}
+
+
