@@ -5,16 +5,17 @@
 # VMs
 $Here_WSV12VMs = @"
 DMZ-FC02
-en-w10IP-Fast
+en-w11IP-Canary
 flets
-jp-w10-CB
-jp-w10IP-Beta
-jp-w10IP-Fast
-jp-w10IP-Release Preview
 jp-w10-LTSB2015
 jp-w10-LTSB2016
 jp-w10-LTSC2019
 jp-w10-LTSC2021
+jp-w11-CB
+jp-w11-Dev
+jp-w11IP-Beta
+jp-w11IP-Canary
+jp-w11IP-Release Preview
 LAN-DC03
 LAN-DHCP02
 LAN-Remote11
