@@ -35,7 +35,10 @@ LAN-Syslog
 "@
 
 
-$TeamsURLFile = "C:\WindowsUpdate\MST_URI.txt"
+
+# トークンファイル
+$G_TokenFileName = "TokenFile.txt"
+
 
 
 ##########################################################################
@@ -91,36 +94,40 @@ function HereString2StringArray( $HereString ){
 }
 
 ####################################
-# Teams メッセージを送る
+# メッセージを送る
 ####################################
-function SendTeams([string]$Message){
+function SendMessage([string]$Message){
 
-	if(-not (Test-Path $TeamsURLFile)){
+	# トークンファイルの取得
+	$TokenFileFullPath = Join-Path $PSScriptRoot $G_TokenFileName
+	if( -not (Test-Path $TokenFileFullPath)){
 		return
 	}
 
-	# Web API の URL
-	[array]$Lines = Get-Content -Path $TeamsURLFile
-	if( $Lines.Count -eq 0 ){
-		# データが入っていない
-		Log "URI file is empty : $TeamsURLFile"
+	try{
+		[array]$TokenData = Get-Content -Path $TokenFileFullPath
+	}
+	catch{
+		Log "[FAIL] !!!!!!!! $TokenFileFullPath read error. !!!!!!!!"
+		exit
+	}
+
+	$Token = $TokenData[0]
+
+	$Channel = $TokenData[1]
+	if(( $Token -eq $null ) -or ( $Channel -eq $null )){
+		Log "[ERROR] !!!!!!!! $TokenFileFullPath format error. !!!!!!!!"
 		return
 	}
 
-	$url = $Lines[0]
-	if( $url.Length -le 35 ){
-		# URIが短すぎ
-		Log "URI data is empty : $TeamsURLFile"
-		return
-	}
+	$url = "https://slack.com/api/chat.postMessage"
 
-	# Message
-	$body = ConvertTo-JSON @{
-		text = "$Message"
+	$body = @{
+		token = $Token
+		channel = $Channel
+		text = $Message
 	}
-
-	# API を叩く
-	Invoke-RestMethod -Method Post -Uri $url -Body $body -ContentType 'application/json'
+	$Dummy = Invoke-RestMethod -Method Post -Uri $url -Body $body
 }
 
 
@@ -138,7 +145,7 @@ function WakeUp([string]$VM_Name){
 	if( ($VM.State -eq [Microsoft.HyperV.PowerShell.VMState]::Off) -or ($VM.State -eq [Microsoft.HyperV.PowerShell.VMState]::Saved) ){
 		$VM_Name = $VM.Name
 		Log "$VM_Name が停止しているので起動"
-		SendTeams "Start VM : $VM_Name"
+		SendMessage "Start VM : $VM_Name"
 		Start-VM -VM $VM
 	}
 }
@@ -166,7 +173,7 @@ foreach( $VM in $VMs){
 if( -not (Test-NetConnection $TergetHost).PingSucceeded ){
 	$Message = "$TergetHost is down !!"
 	Log $Message
-	SendTeams $Message
+	SendMessage $Message
 }
 
 
