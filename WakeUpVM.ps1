@@ -177,4 +177,5 @@ if( -not (Test-NetConnection $TergetHost).PingSucceeded ){
 	SendMessage $Message
 }
 
+Log "Check End"
 
