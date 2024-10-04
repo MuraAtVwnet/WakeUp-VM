@@ -13,6 +13,7 @@ jp-w10-LTSC2019
 jp-w10-LTSC2021
 jp-w11-CB
 jp-w11-Dev
+jp-w11-LTSC2024
 jp-w11IP-Beta
 jp-w11IP-Canary
 jp-w11IP-Release Preview
