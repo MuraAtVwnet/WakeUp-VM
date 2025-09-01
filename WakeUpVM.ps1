@@ -19,7 +19,6 @@ jp-w11IP-Canary
 jp-w11IP-Release Preview
 LAN-DC03
 LAN-DHCP02
-LAN-Remote11
 VirusCheck
 "@
 
@@ -33,6 +32,7 @@ LAN-DC01
 LAN-DHCP01
 LAN-File01
 LAN-Syslog
+LAN-Remote11
 "@
 
 
